@@ -1,0 +1,33 @@
+name: pipeline  #name of the workflow
+on:  #when to run the workflow
+    push:  # specifies that should run when anything pushed to branches and mention which branches
+        branches: [ "main" ]
+    workflow_dispatch: #let you manually deploy/run from the UI
+
+jobs: #jobs has th aactual thing which need to be done
+    build:  # name for job, we can have multiple jobs
+        runs-on: ubuntu-latest  # mention if need to be run on perticular os/ami for server
+        steps: # steps to perform after the server is started 
+            - uses: actions/checkout@v4  #clones the repo into the server
+            - name: say hello # name of the step
+              run: |  # enter the commands to be run here, one job one run block, for multible cammands use | line
+                    echo "hello from actions!!"
+                    echo "building app/code!!!"
+    testing:
+        needs: build # add pre request if any, like you need to run this job only when the build is succesfull
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: testing
+              run: |
+                        echo "testing code"
+                        echo "testing done!!!"
+    deploy:
+        needs: ["build", "testing" ]
+        runs-on: ubuntu-latest
+        name: deploy
+        steps:
+            - uses: actions/checkout@v4
+            - run: |
+                        echo "deployment started..."
+                        echo "deployment done!!!"
